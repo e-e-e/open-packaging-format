@@ -29,7 +29,7 @@ export class OPF {
   }
 
   get contributors() {
-    return this.getList('dc:contributors');
+    return this.getList('dc:contributor');
   }
 
   get description() {
@@ -42,6 +42,10 @@ export class OPF {
 
   get subjects() {
     return this.getList('dc:subject');
+  }
+
+  get languages() {
+    return this.getList('dc:language');
   }
 
   get format() {
@@ -73,7 +77,7 @@ export class OPF {
 
   getList(name, id = '_') {
     if (Array.isArray(this.obj[name])) {
-      return this.obj[name].map(c => c[id]);
+      return this.obj[name].map(c => typeof c === 'object' ? c[id] : c);
     }
     return undefined;
   }

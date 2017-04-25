@@ -11,7 +11,7 @@
     "test": "mocha --compilers js:babel-register"
   },
   "author": {
-    "name": "Benjamin Forster",
+    "name": "Benjamin Forster"
   },
   "contributors": [{
     "name": "Sean Dockray"

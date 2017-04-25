@@ -21,6 +21,16 @@ describe('readOPF', () => {
     return promise.should.eventually.be.rejected;
   });
 
+  it('should return a rejected promise if the file is malformed', () => {
+    const promise = readOPF(path.join(__dirname, './samples/malformed.opf'));
+    return promise.should.eventually.be.rejected;
+  });
+
+  it('should return a OMF object even if metadata is empty', () => {
+    const promise = readOPF(path.join(__dirname, './samples/empty.opf'));
+    expect(promise).to.eventually.be.an.instanceof(OPF);
+  });
+
   context('with successfully returned OPF object', () => {
     let opf;
     before(() => readOPF(path.join(__dirname, './samples/metadata.opf')).then((obj) => { opf = obj; }));
