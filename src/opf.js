@@ -9,6 +9,7 @@ import xml2js from 'xml2js';
 const readFileAsync = Promise.promisify(fs.readFile);
 const parseStringAsync = Promise.promisify(xml2js.parseString);
 
+const defaultXMLIteratee = t => (typeof t === 'object' ? t._ : t);
 // Extracted Opf metadata gets packaged into an OPF
 export class OPF {
   constructor(parsedXmlData) {
@@ -92,9 +93,9 @@ export class OPF {
     return ids;
   }
 
-  getList(name, id = '_') {
+  getList(name, iteratee = defaultXMLIteratee) {
     if (Array.isArray(this.obj[name])) {
-      return this.obj[name].map(c => typeof c === 'object' ? c[id] : c);
+      return this.obj[name].map(iteratee);
     }
     return undefined;
   }
