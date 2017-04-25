@@ -5,11 +5,29 @@
 import fs from 'fs';
 import Promise from 'bluebird';
 import xml2js from 'xml2js';
+import _ from 'lodash';
+
+import { OPF_ROLES } from './constants.js';
 
 const readFileAsync = Promise.promisify(fs.readFile);
 const parseStringAsync = Promise.promisify(xml2js.parseString);
 
 const defaultXMLIteratee = t => (typeof t === 'object' ? t._ : t);
+
+const opfIteratee = (t) => {
+  if (typeof t !== 'object') {
+    return { value: t };
+  }
+  const data = { value: t._ };
+  const opfAttrs = typeof t.$ === 'object' ? Object.keys(t.$).filter(key => /^opf:/.test(key)) : [];
+  opfAttrs.forEach((attr) => {
+    const name = _.camelCase(attr.slice(4));
+    const value = t.$[attr];
+    data[name] = name === 'role' ? OPF_ROLES[value].name : value;
+  });
+  return data;
+};
+
 // Extracted Opf metadata gets packaged into an OPF
 export class OPF {
   constructor(parsedXmlData) {
@@ -30,7 +48,7 @@ export class OPF {
   }
 
   get contributors() {
-    return this.getList('dc:contributor');
+    return this.getList('dc:contributor', opfIteratee);
   }
 
   get description() {
