@@ -75,21 +75,6 @@ export class OPF {
     return this.getField('dc:rights');
   }
 
-  getList(name, id = '_') {
-    if (Array.isArray(this.obj[name])) {
-      return this.obj[name].map(c => typeof c === 'object' ? c[id] : c);
-    }
-    return undefined;
-  }
-
-  getField(name, index = 0) {
-    const field = this.obj[name];
-    if (field && Array.isArray(field) && field.length > index) {
-      return this.obj[name][index];
-    }
-    return undefined;
-  }
-
   get identifiers() {
     const ids = {};
     const obj = this.obj;
@@ -105,6 +90,21 @@ export class OPF {
       }
     };
     return ids;
+  }
+
+  getList(name, id = '_') {
+    if (Array.isArray(this.obj[name])) {
+      return this.obj[name].map(c => typeof c === 'object' ? c[id] : c);
+    }
+    return undefined;
+  }
+
+  getField(name, index = 0) {
+    const field = this.obj[name];
+    if (field && Array.isArray(field) && field.length > index) {
+      return this.obj[name][index];
+    }
+    return undefined;
   }
 }
 
