@@ -1,4 +1,10 @@
-const ROLES = {
+export const DATE_EVENTS = [
+  'creation',
+  'publication',
+  'modification',
+];
+
+export const ROLES = {
   adp: {
     name: 'Adapter',
     description: 'Use for a person who 1) reworks a musical composition, usually for a different medium, or 2) rewrites novels or stories for motion pictures or other audiovisual medium.',
