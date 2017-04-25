@@ -33,6 +33,23 @@ describe('readOPF', () => {
       expect(opf.description).to.be.a('string');
     });
 
+    it('has an array of languages, including "en"', () => {
+      expect(opf.languages).to.be.a('array');
+      expect(opf.languages).to.include('en');
+    });
+
+    it('has a list of authors', () => {
+      expect(opf.authors).to.be.a('array');
+    });
+
+    it('has a list of contributors', () => {
+      expect(opf.contributors).to.be.a('array');
+    });
+
+    it('has format value equal to "application/pdf"', () => {
+      expect(opf.format).to.eql('application/pdf');
+    });
+
     it('has property identifiers which is an iterator', () => {
       expect(opf.identifiers).to.be.iterable;
       expect(opf.identifiers).to.iterate.for.lengthOf(3);
