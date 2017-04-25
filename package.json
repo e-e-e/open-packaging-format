@@ -10,8 +10,20 @@
     "dev": "rm -rf ./dist && babel --source-maps -w src --out-dir dist --copy-files",
     "test": "mocha --compilers js:babel-register"
   },
-  "author": "",
+  "author": {
+    "name": "Benjamin Forster",
+  },
+  "contributors": [{
+    "name": "Sean Dockray"
+  }],
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/e-e-e/open-packaging-format.git"
+  },
+  "bugs": {
+    "url": "https://github.com/e-e-e/open-packaging-format/issues"
+  },
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.23.0",
