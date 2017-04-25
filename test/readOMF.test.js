@@ -60,6 +60,11 @@ describe('readOPF', () => {
       expect(opf.format).to.eql('application/pdf');
     });
 
+    it('has an array of subjects', () => {
+      expect(opf.subjects).to.be.a('array');
+      expect(opf.subjects).to.include('Philosophy');
+    });
+
     it('has property identifiers which is an iterator', () => {
       expect(opf.identifiers).to.be.iterable;
       expect(opf.identifiers).to.iterate.for.lengthOf(3);
@@ -68,6 +73,34 @@ describe('readOPF', () => {
         { uuid: 'fb308377-e17b-4d7b-8f77-cf0657a86c11' },
         { ARG: '51c584186c3a0ed90bcd0800.1' },
       ]);
+    });
+  });
+
+  context('with successfully returned but empty OPF object', () => {
+    let opf;
+
+    before(() => readOPF(path.join(__dirname, './samples/empty.opf')).then((obj) => { opf = obj; }));
+
+    it('has all properties as undefined', () => {
+      const properties = [
+        'title',
+        'format',
+        'subjects',
+        'authors',
+        'description',
+        'contributors',
+        'languages',
+        'source',
+        'type',
+      ];
+      for (const property in properties) {
+        expect(opf[property]).to.eql(undefined);
+      }
+    })
+
+    it('has identifiers which is an empty iterator', () => {
+      expect(opf.identifiers).to.be.iterable;
+      expect(opf.identifiers).to.iterate.for.lengthOf(0);
     });
   });
 });
