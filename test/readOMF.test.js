@@ -48,8 +48,19 @@ describe('readOPF', () => {
       expect(opf.languages).to.include('en');
     });
 
-    it('has a list of authors', () => {
+    it('has a list of authors as objects with value and opf attributes', () => {
       expect(opf.authors).to.be.a('array');
+      expect(opf.authors).to.have.length(13);
+      expect(opf.authors).to.include({
+        value: 'Gyan Prakash',
+        fileAs: 'Prakash, Gyan, , ,',
+        role: 'Editor',
+      });
+      expect(opf.authors).to.include({
+        value: 'Edward Said',
+        fileAs: 'Prakash, Gyan, , ,',
+        role: 'Author',
+      });
     });
 
     it('has a list of contributors', () => {
@@ -96,7 +107,7 @@ describe('readOPF', () => {
       for (const property in properties) {
         expect(opf[property]).to.eql(undefined);
       }
-    })
+    });
 
     it('has identifiers which is an empty iterator', () => {
       expect(opf.identifiers).to.be.iterable;

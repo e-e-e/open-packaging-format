@@ -44,7 +44,7 @@ export class OPF {
   }
 
   get authors() {
-    return this.getList('dc:creator');
+    return this.getList('dc:creator', opfIteratee);
   }
 
   get contributors() {

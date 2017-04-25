@@ -13,9 +13,11 @@
   "author": {
     "name": "Benjamin Forster"
   },
-  "contributors": [{
-    "name": "Sean Dockray"
-  }],
+  "contributors": [
+    {
+      "name": "Sean Dockray"
+    }
+  ],
   "private": true,
   "repository": {
     "type": "git",
@@ -45,6 +47,7 @@
   },
   "dependencies": {
     "bluebird": "^3.4.7",
+    "lodash": "^4.17.4",
     "xml2js": "^0.4.17"
   }
 }
