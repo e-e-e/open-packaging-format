@@ -12,6 +12,16 @@ npm install open-packaging-format;
 
 ## Simple Use:
 
-```
+```js
+import { readOPF } from 'open-packaging-format';
 
+readOPF('some/dir/to/metadata.opf')
+  .then((opf) => {
+    console.log(opf.title);
+    console.log(opf.description);
+    for (const id of opf.identifiers) {
+      console.log(id);
+    }
+  })
+  .catch(console.error);
 ```
