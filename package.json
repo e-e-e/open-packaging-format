@@ -2,6 +2,13 @@
   "name": "open-packaging-format",
   "version": "0.0.1",
   "description": "A parser for omf documents.",
+  "keywords": [
+    "opf",
+    "open packaging format",
+    "calibre",
+    "ebooks",
+    "metadata",
+  ],
   "main": "index.js",
   "scripts": {
     "prepublish": "npm run babel",
