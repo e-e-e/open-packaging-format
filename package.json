@@ -1,7 +1,7 @@
 {
   "name": "open-packaging-format",
   "version": "0.0.2",
-  "description": "A parser for omf documents.",
+  "description": "A parser for opf documents.",
   "keywords": [
     "opf",
     "open packaging format",
