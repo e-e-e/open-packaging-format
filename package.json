@@ -19,7 +19,6 @@
       "name": "Sean Dockray"
     }
   ],
-  "private": true,
   "repository": {
     "type": "git",
     "url": "git+https://github.com/e-e-e/open-packaging-format.git"
