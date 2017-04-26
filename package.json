@@ -7,7 +7,7 @@
     "open packaging format",
     "calibre",
     "ebooks",
-    "metadata",
+    "metadata"
   ],
   "main": "index.js",
   "scripts": {
