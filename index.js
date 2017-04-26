@@ -1,1 +1,1 @@
-module.exports = require('./dist/catalog');
+module.exports = require('./dist/opf');
