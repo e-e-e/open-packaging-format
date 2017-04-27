@@ -7,10 +7,13 @@ import Promise from 'bluebird';
 import xml2js from 'xml2js';
 import _ from 'lodash';
 
-import { OPF_ROLES } from './constants.js';
+import { OPF_ROLES, OPF_BASE } from './constants.js';
 
 const readFileAsync = Promise.promisify(fs.readFile);
+const writeFileAsync = Promise.promisify(fs.writeFile);
 const parseStringAsync = Promise.promisify(xml2js.parseString);
+
+const builder = new xml2js.Builder();
 
 const defaultXMLIteratee = t => (typeof t === 'object' ? t._ : t);
 
@@ -31,12 +34,16 @@ const opfIteratee = (t) => {
 // Extracted Opf metadata gets packaged into an OPF
 export class OPF {
   constructor(parsedXmlData) {
-    this.data = parsedXmlData;
-    this.obj = parsedXmlData.package.metadata[0];
+    const parsedXmlDataToUse = parsedXmlData || OPF_BASE;
+    this.data = parsedXmlDataToUse;
   }
 
   get title() {
     return this.getField('dc:title');
+  }
+
+  set title(title) {
+    this.data.package.metadata[0]['dc:title'][0] = title;
   }
 
   get allTitles() {
@@ -96,7 +103,7 @@ export class OPF {
 
   get identifiers() {
     const ids = {};
-    const obj = this.obj;
+    const obj = this._obj;
     ids[Symbol.iterator] = function* () {
       if (Array.isArray(obj['dc:identifier'])) {
         for (const i of obj['dc:identifier']) {
@@ -111,19 +118,27 @@ export class OPF {
     return ids;
   }
 
+  get _obj() {
+    return this.data.package.metadata[0];
+  }
+
   getList(name, iteratee = defaultXMLIteratee) {
-    if (Array.isArray(this.obj[name])) {
-      return this.obj[name].map(iteratee);
+    if (Array.isArray(this._obj[name])) {
+      return this._obj[name].map(iteratee);
     }
     return undefined;
   }
 
   getField(name, index = 0) {
-    const field = this.obj[name];
+    const field = this._obj[name];
     if (field && Array.isArray(field) && field.length > index) {
-      return this.obj[name][index];
+      return this._obj[name][index];
     }
     return undefined;
+  }
+
+  toXML() {
+    return builder.buildObject(this.data);
   }
 }
 
@@ -135,6 +150,6 @@ export function readOPF(fileLoc, encoding = 'utf-8') {
 }
 
 // Writes an opf file from an OPF object
-export function writeOPF(fileLoc, obj) {
-  console.log(`Writing OPFs is not implemented yet: ${obj}`);
+export function writeOPF(fileLoc, opf) {
+  return writeFileAsync(fileLoc, opf.toXML());
 }
