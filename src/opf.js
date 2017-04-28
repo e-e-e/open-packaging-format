@@ -7,7 +7,7 @@ import Promise from 'bluebird';
 import xml2js from 'xml2js';
 import _ from 'lodash';
 
-import { OPF_ROLES, OPF_BASE } from './constants.js';
+import { OPF_ROLES, OPF_DEFAULT } from './constants';
 
 const readFileAsync = Promise.promisify(fs.readFile);
 const writeFileAsync = Promise.promisify(fs.writeFile);
@@ -34,7 +34,7 @@ const opfIteratee = (t) => {
 // Extracted Opf metadata gets packaged into an OPF
 export class OPF {
   constructor(parsedXmlData) {
-    const parsedXmlDataToUse = parsedXmlData || OPF_BASE;
+    const parsedXmlDataToUse = parsedXmlData || OPF_DEFAULT;
     this.data = parsedXmlDataToUse;
   }
 

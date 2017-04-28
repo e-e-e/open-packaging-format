@@ -25,3 +25,15 @@ readOPF('some/dir/to/metadata.opf')
   })
   .catch(console.error);
 ```
+
+demonstrating writing data to an OPF and then that data to a file:
+
+```js
+import OPF, { writeOPF } from 'open-packaging-format';
+
+const opf = new OPF();
+opf.title = 'This is a good title';
+o.writeOPF('/path/to/your.xml', opf)
+  .catch(console.error);
+
+```
