@@ -43,19 +43,6 @@ export class OPF {
     this.metadata = this.data.package.metadata[0];
   }
 
-  get title() {
-    return this.getField('dc:title');
-  }
-
-  set title(title) {
-    assert(typeof title === 'string', 'title must be set with a string!');
-    if (!Array.isArray(this.metadata['dc:title'])) {
-      this.metadata['dc:title'] = [title];
-    } else {
-      this.metadata['dc:title'][0] = title;
-    }
-  }
-
   get allTitles() {
     return this.getList('dc:title');
   }
@@ -92,13 +79,9 @@ export class OPF {
     return this.getList('dc:contributor', opfIteratee);
   }
 
-  get description() {
-    return this.getField('dc:description');
-  }
-
-  set description(string) {
-    assert(typeof string === 'string', 'description must be set with a string');
-    this.metadata['dc:description'] = [string];
+  set contributors(contributors) {
+    // TODO: abstract code from authors for reuse here.
+    console.log(contributors);
   }
 
   get publishers() {
@@ -113,14 +96,6 @@ export class OPF {
     return this.getList('dc:language');
   }
 
-  get format() {
-    return this.getField('dc:format');
-  }
-
-  get type() {
-    return this.getField('dc:type');
-  }
-
   get date() {
     // TO DO:
     // opf-event data should be fetched as well.
@@ -132,19 +107,7 @@ export class OPF {
     // TO DO:
     // opf-event data should be fetched as well.
     // detect and convert to date object (YYYY[-MM[-DD]])
-    return this.getField('dc:date');
-  }
-
-  get source() {
-    return this.getField('dc:source');
-  }
-
-  get coverage() {
-    return this.getField('dc:coverage');
-  }
-
-  get rights() {
-    return this.getField('dc:rights');
+    this.metadata['dc:date'] = [date];
   }
 
   get identifiers() {
@@ -165,6 +128,7 @@ export class OPF {
   }
 
   set identifiers(ids) {
+    // TODO: need to assert that one of these has an id and that that id is equal to packas's unique-identifier attr.
     assert(typeof ids === 'object', 'identifiers to be set as a key, value object, eg. { scheme: id }');
     this.metadata['dc:identifier'] = _.map(ids, (id, scheme) => ({
       $: {
@@ -194,6 +158,27 @@ export class OPF {
     return builder.buildObject(this.data);
   }
 }
+
+// Attach getter and setters to OPF programmatically based on expected metadata;
+
+const simpleDublinCoreProperties = ['title', 'description', 'type', 'format', 'coverage', 'rights', 'source'];
+
+simpleDublinCoreProperties.forEach((property) => {
+  const dcProperty = `dc:${property}`;
+  Object.defineProperty(OPF.prototype, property, {
+    get: function get() {
+      return this.getField(dcProperty);
+    },
+    set: function set(value) {
+      assert(typeof value === 'string', `${dcProperty} must be set with a string!`);
+      if (!Array.isArray(this.metadata[dcProperty])) {
+        this.metadata[dcProperty] = [value];
+      } else {
+        this.metadata[dcProperty][0] = value;
+      }
+    },
+  });
+});
 
 // Parses an opf file
 export function readOPF(fileLoc, encoding = 'utf-8') {
