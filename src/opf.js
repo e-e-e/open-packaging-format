@@ -36,6 +36,7 @@ export class OPF {
   constructor(parsedXmlData) {
     const parsedXmlDataToUse = parsedXmlData || OPF_DEFAULT;
     this.data = parsedXmlDataToUse;
+    this.metadata = this.data.package.metadata[0];
   }
 
   get title() {
@@ -43,7 +44,7 @@ export class OPF {
   }
 
   set title(title) {
-    this.data.package.metadata[0]['dc:title'][0] = title;
+    this.metadata['dc:title'][0] = title;
   }
 
   get allTitles() {
@@ -103,7 +104,7 @@ export class OPF {
 
   get identifiers() {
     const ids = {};
-    const obj = this._obj;
+    const obj = this.metadata;
     ids[Symbol.iterator] = function* () {
       if (Array.isArray(obj['dc:identifier'])) {
         for (const i of obj['dc:identifier']) {
@@ -118,26 +119,23 @@ export class OPF {
     return ids;
   }
 
-  get _obj() {
-    return this.data.package.metadata[0];
-  }
-
   getList(name, iteratee = defaultXMLIteratee) {
-    if (Array.isArray(this._obj[name])) {
-      return this._obj[name].map(iteratee);
+    if (Array.isArray(this.metadata[name])) {
+      return this.metadata[name].map(iteratee);
     }
     return undefined;
   }
 
   getField(name, index = 0) {
-    const field = this._obj[name];
+    const field = this.metadata[name];
     if (field && Array.isArray(field) && field.length > index) {
-      return this._obj[name][index];
+      return this.metadata[name][index];
     }
     return undefined;
   }
 
   toXML() {
+    this.data.package.metadata = [this.metadata];
     return builder.buildObject(this.data);
   }
 }
