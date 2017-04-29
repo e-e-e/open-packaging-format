@@ -120,16 +120,18 @@ describe('OPF class', () => {
       expect(opf.allTitles).to.eql(titles);
     });
 
-    it('throws error if you try and set title as anything but string', () => {
+    it('custom identifiers can be set via key: value paired object', () => {
       const opf = new OPF();
-      const erroredTypes = [1, [], {}, null, undefined, NaN];
-      erroredTypes.forEach(t => expect(() => { opf.title = t; }).to.throw(Error, /must be set with a string!/));
-    });
-
-    it('throws error if you try and set allTitles as anything but array', () => {
-      const opf = new OPF();
-      const erroredTypes = ['ok', 1, [3, {}], {}, null, undefined, NaN];
-      erroredTypes.forEach(t => expect(() => { opf.allTitles = t; }).to.throw(Error, /must be set with an array of strings!/));
+      opf.identifiers = {
+        calibre: '2341455',
+        aaarg: 'sa234324',
+      };
+      expect(opf.identifiers).to.be.iterable;
+      expect(opf.identifiers).to.iterate.for.lengthOf(2);
+      expect(opf.identifiers).to.deep.iterate.from([
+        { calibre: '2341455' },
+        { aaarg: 'sa234324' },
+      ]);
     });
 
     it('should return the default.opf XML with toXML() method', async () => {
@@ -138,4 +140,17 @@ describe('OPF class', () => {
       expect(`${opf.toXML()}\n`).to.eql(defaultXML.toString());
     });
   });
+
+  it('throws error if you try and set title as anything but string', () => {
+    const opf = new OPF();
+    const erroredTypes = [1, [], {}, null, undefined, NaN];
+    erroredTypes.forEach(t => expect(() => { opf.title = t; }).to.throw(Error, /must be set with a string!/));
+  });
+
+  it('throws error if you try and set allTitles as anything but array', () => {
+    const opf = new OPF();
+    const erroredTypes = ['ok', 1, [3, {}], {}, null, undefined, NaN];
+    erroredTypes.forEach(t => expect(() => { opf.allTitles = t; }).to.throw(Error, /must be set with an array of strings!/));
+  });
+
 });

@@ -133,6 +133,16 @@ export class OPF {
     return ids;
   }
 
+  set identifiers(ids) {
+    assert(typeof ids === 'object', 'identifiers to be set as a key, value object, eg. { scheme: id }');
+    this.metadata['dc:identifier'] = _.map(ids, (id, scheme) => ({
+      $: {
+        'opf:scheme': scheme,
+      },
+      _: id,
+    }));
+  }
+
   getList(name, iteratee = defaultXMLIteratee) {
     if (Array.isArray(this.metadata[name])) {
       return this.metadata[name].map(iteratee);

@@ -10,7 +10,6 @@ export const OPF_DEFAULT = {
           'xmlns:dc': 'http://purl.org/dc/elements/1.1/',
           'xmlns:opf': 'http://www.idpf.org/2007/opf',
         },
-        'dc:title': [],
       },
     ],
   },
