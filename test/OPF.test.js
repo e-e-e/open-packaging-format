@@ -103,6 +103,14 @@ describe('OPF class', () => {
       expect(opf.data).to.eql(OPF_DEFAULT);
     });
 
+    it('can have a multiple titles set', () => {
+      const opf = new OPF();
+      const titles = ['This is a good title', 'and an ok subtitle'];
+      opf.allTitles = titles;
+      expect(opf.title).to.eql(titles[0]);
+      expect(opf.allTitles).to.eql(titles);
+    });
+
     it('primary title can be set directly, this will not effect subtitles', () => {
       const opf = new OPF();
       const titles = ['This is a good title', 'and an ok subtitle'];
@@ -112,12 +120,16 @@ describe('OPF class', () => {
       expect(opf.allTitles).to.eql(titles);
     });
 
-    it('can have a multiple titles set', () => {
+    it('throws error if you try and set title as anything but string', () => {
       const opf = new OPF();
-      const titles = ['This is a good title', 'and an ok subtitle'];
-      opf.allTitles = titles;
-      expect(opf.title).to.eql(titles[0]);
-      expect(opf.allTitles).to.eql(titles);
+      const erroredTypes = [1, [], {}, null, undefined, NaN];
+      erroredTypes.forEach(t => expect(() => { opf.title = t; }).to.throw(Error, /must be set with a string!/));
+    });
+
+    it('throws error if you try and set allTitles as anything but array', () => {
+      const opf = new OPF();
+      const erroredTypes = ['ok', 1, [3, {}], {}, null, undefined, NaN];
+      erroredTypes.forEach(t => expect(() => { opf.allTitles = t; }).to.throw(Error, /must be set with an array of strings!/));
     });
 
     it('should return the default.opf XML with toXML() method', async () => {

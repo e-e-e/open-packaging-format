@@ -61,7 +61,7 @@ export class OPF {
   }
 
   set allTitles(titles) {
-    assert(Array.isArray(titles), 'title must be set with an array of strings!');
+    assert(Array.isArray(titles) && titles.every(e => typeof e === 'string'), 'allTitles must be set with an array of strings!');
     this.metadata['dc:title'] = titles;
   }
 
