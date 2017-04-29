@@ -165,19 +165,18 @@ const simpleDublinCoreProperties = ['title', 'description', 'type', 'format', 'c
 
 simpleDublinCoreProperties.forEach((property) => {
   const dcProperty = `dc:${property}`;
-  Object.defineProperty(OPF.prototype, property, {
-    get: function get() {
-      return this.getField(dcProperty);
-    },
-    set: function set(value) {
-      assert(typeof value === 'string', `${dcProperty} must be set with a string!`);
-      if (!Array.isArray(this.metadata[dcProperty])) {
-        this.metadata[dcProperty] = [value];
-      } else {
-        this.metadata[dcProperty][0] = value;
-      }
-    },
-  });
+  function set(value) {
+    assert(typeof value === 'string', `${dcProperty} must be set with a string!`);
+    if (!Array.isArray(this.metadata[dcProperty])) {
+      this.metadata[dcProperty] = [value];
+    } else {
+      this.metadata[dcProperty][0] = value;
+    }
+  }
+  function get() {
+    return this.getField(dcProperty);
+  }
+  Object.defineProperty(OPF.prototype, property, { get, set });
 });
 
 // Parses an opf file
