@@ -102,13 +102,28 @@ describe('OPF class', () => {
       const opf = new OPF();
       expect(opf.data).to.eql(OPF_DEFAULT);
     });
-  });
 
-  context('using method toXML', () => {
-    it('an empty OPF should return the default.opf XML', async () => {
+    it('primary title can be set directly, this will not effect subtitles', () => {
+      const opf = new OPF();
+      const titles = ['This is a good title', 'and an ok subtitle'];
+      opf.allTitles = titles;
+      opf.title = titles[0];
+      expect(opf.title).to.eql(titles[0]);
+      expect(opf.allTitles).to.eql(titles);
+    });
+
+    it('can have a multiple titles set', () => {
+      const opf = new OPF();
+      const titles = ['This is a good title', 'and an ok subtitle'];
+      opf.allTitles = titles;
+      expect(opf.title).to.eql(titles[0]);
+      expect(opf.allTitles).to.eql(titles);
+    });
+
+    it('should return the default.opf XML with toXML() method', async () => {
       const defaultXML = await fs.readFile(path.join(__dirname, './samples/default.opf'));
       const opf = new OPF();
-      expect(opf.toXML() + '\n').to.eql(defaultXML.toString());
+      expect(`${opf.toXML()}\n`).to.eql(defaultXML.toString());
     });
   });
 });

@@ -13,6 +13,12 @@ const parseStringAsync = Promise.promisify(xml2js.parseString);
 
 const builder = new xml2js.Builder();
 
+function assert(condition, message) {
+  if (!condition) {
+    throw new Error(message);
+  }
+}
+
 const defaultXMLIteratee = t => (typeof t === 'object' ? t._ : t);
 
 const opfIteratee = (t) => {
@@ -32,7 +38,7 @@ const opfIteratee = (t) => {
 // Extracted Opf metadata gets packaged into an OPF
 export class OPF {
   constructor(parsedXmlData) {
-    const parsedXmlDataToUse = parsedXmlData || OPF_DEFAULT;
+    const parsedXmlDataToUse = parsedXmlData || _.cloneDeep(OPF_DEFAULT);
     this.data = parsedXmlDataToUse;
     this.metadata = this.data.package.metadata[0];
   }
@@ -42,11 +48,21 @@ export class OPF {
   }
 
   set title(title) {
-    this.metadata['dc:title'][0] = title;
+    assert(typeof title === 'string', 'title must be set with a string!');
+    if (!Array.isArray(this.metadata['dc:title'])) {
+      this.metadata['dc:title'] = [title];
+    } else {
+      this.metadata['dc:title'][0] = title;
+    }
   }
 
   get allTitles() {
     return this.getList('dc:title');
+  }
+
+  set allTitles(titles) {
+    assert(Array.isArray(titles), 'title must be set with an array of strings!');
+    this.metadata['dc:title'] = titles;
   }
 
   get authors() {
