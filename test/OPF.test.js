@@ -120,7 +120,18 @@ describe('OPF class', () => {
       expect(opf.allTitles).to.eql(titles);
     });
 
-    it('custom identifiers can be set via key: value paired object', () => {
+    it('sets authors with an array of strings or objects: { value, role, fileAs }', () => {
+      const opf = new OPF();
+      const authors = [{
+        value: 'Judith Butler',
+        fileAs: 'Butler, Judith',
+        role: 'Author',
+      }];
+      opf.authors = authors;
+      expect(opf.authors).to.eql(authors);
+    });
+
+    it('sets multiple custom identifiers via key: value paired object', () => {
       const opf = new OPF();
       opf.identifiers = {
         calibre: '2341455',

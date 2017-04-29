@@ -7,7 +7,7 @@ import xml2js from 'xml2js';
 import _ from 'lodash';
 
 import * as fs from './fsAsync';
-import { OPF_ROLES, OPF_DEFAULT } from './constants';
+import { OPF_ROLES, OPF_DEFAULT, NAME_TO_OPF_CODE } from './constants';
 
 const parseStringAsync = Promise.promisify(xml2js.parseString);
 
@@ -67,6 +67,19 @@ export class OPF {
 
   get authors() {
     return this.getList('dc:creator', opfIteratee);
+  }
+
+  set authors(authors) {
+    // expect array of objects, or strings,
+    this.metadata['dc:creator'] = authors.map(author => ({
+      $: _.keys(author).reduce((p, v) => {
+        if (v !== 'value') {
+          p[`opf:${_.kebabCase(v)}`] = (v === 'role') ? NAME_TO_OPF_CODE[author[v]] : author[v];
+        }
+        return p;
+      }, {}),
+      _: author.value,
+    }));
   }
 
   get contributors() {
