@@ -70,7 +70,7 @@ export class OPF {
   }
 
   set authors(authors) {
-    assert(Array.isArray(authors) && authors.every(e => typeof e === 'string' || (typeof e === 'object' && typeof e.value === 'string')), 'authors must be set with an array objects { value, role }!');
+    assert(Array.isArray(authors) && authors.every(e => typeof e === 'string' || (typeof e === 'object' && typeof e.value === 'string')), 'authors must be set with an array of strings and/or objects { value, role }!');
     // expect array of objects, or strings,
     this.metadata['dc:creator'] = authors.map((author) => {
       const data = { $: {}, _: author.value };
@@ -94,6 +94,11 @@ export class OPF {
 
   get description() {
     return this.getField('dc:description');
+  }
+
+  set description(string) {
+    assert(typeof string === 'string', 'description must be set with a string');
+    this.metadata['dc:description'] = [string];
   }
 
   get publishers() {

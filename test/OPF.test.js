@@ -131,6 +131,16 @@ describe('OPF class', () => {
       expect(opf.authors).to.eql(authors);
     });
 
+    it('sets description with string', () => {
+      const opf = new OPF();
+      const description = `
+        this is my long description,
+        it is a few lines of text.
+      `;
+      opf.description = description;
+      expect(opf.description).to.eql(description);
+    });
+
     it('sets multiple custom identifiers via key: value paired object', () => {
       const opf = new OPF();
       opf.identifiers = {
