@@ -2,15 +2,13 @@
  * OPF metadata handling
  * Ability to do basic reading and writing of Calibre's opf (xml) metadata format
  */
-import fs from 'fs';
 import Promise from 'bluebird';
 import xml2js from 'xml2js';
 import _ from 'lodash';
 
+import * as fs from './fsAsync';
 import { OPF_ROLES, OPF_DEFAULT } from './constants';
 
-const readFileAsync = Promise.promisify(fs.readFile);
-const writeFileAsync = Promise.promisify(fs.writeFile);
 const parseStringAsync = Promise.promisify(xml2js.parseString);
 
 const builder = new xml2js.Builder();
@@ -142,12 +140,12 @@ export class OPF {
 
 // Parses an opf file
 export function readOPF(fileLoc, encoding = 'utf-8') {
-  return readFileAsync(fileLoc, encoding)
+  return fs.readFile(fileLoc, encoding)
     .then(data => parseStringAsync(data))
     .then(xml => new OPF(xml));
 }
 
 // Writes an opf file from an OPF object
 export function writeOPF(fileLoc, opf) {
-  return writeFileAsync(fileLoc, opf.toXML());
+  return fs.writeFile(fileLoc, opf.toXML());
 }

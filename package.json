@@ -52,7 +52,8 @@
     "eslint-plugin-jsx-a11y": "^4.0.0",
     "eslint-plugin-react": "^6.9.0",
     "istanbul": "^1.0.0-alpha.2",
-    "mocha": "^3.3.0"
+    "mocha": "^3.3.0",
+    "sinon": "^2.1.0"
   },
   "dependencies": {
     "bluebird": "^3.4.7",
