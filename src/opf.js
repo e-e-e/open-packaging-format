@@ -70,16 +70,22 @@ export class OPF {
   }
 
   set authors(authors) {
+    assert(Array.isArray(authors) && authors.every(e => typeof e === 'string' || (typeof e === 'object' && typeof e.value === 'string')), 'authors must be set with an array objects { value, role }!');
     // expect array of objects, or strings,
-    this.metadata['dc:creator'] = authors.map(author => ({
-      $: _.keys(author).reduce((p, v) => {
-        if (v !== 'value') {
-          p[`opf:${_.kebabCase(v)}`] = (v === 'role') ? NAME_TO_OPF_CODE[author[v]] : author[v];
-        }
-        return p;
-      }, {}),
-      _: author.value,
-    }));
+    this.metadata['dc:creator'] = authors.map((author) => {
+      const data = { $: {}, _: author.value };
+      if (typeof author === 'string') {
+        data.$['opf:role'] = 'aut';
+      } else {
+        data.$ = _.keys(author).reduce((p, v) => {
+          if (v !== 'value') {
+            p[`opf:${_.kebabCase(v)}`] = (v === 'role') ? NAME_TO_OPF_CODE[author[v]] || 'aut' : author[v];
+          }
+          return p;
+        }, {});
+      }
+      return data;
+    });
   }
 
   get contributors() {
@@ -111,6 +117,13 @@ export class OPF {
   }
 
   get date() {
+    // TO DO:
+    // opf-event data should be fetched as well.
+    // detect and convert to date object (YYYY[-MM[-DD]])
+    return this.getField('dc:date');
+  }
+
+  set date(date) {
     // TO DO:
     // opf-event data should be fetched as well.
     // detect and convert to date object (YYYY[-MM[-DD]])
