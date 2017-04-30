@@ -19,51 +19,62 @@ function assert(condition, message) {
   }
 }
 
-// returns only the child value of the xml element
-const defaultXMLIteratee = t => (typeof t === 'object' ? t._ : t);
-
-// returns object representing the xml element
-export const opfIteratee = (t) => {
-  if (typeof t !== 'object') {
-    return { value: t };
-  }
-  const data = Object.keys(t.$).reduce((p, attr) => {
-    const value = t.$[attr];
-    const result = attr.match(/^(\w+):(\S+)/);
-    if (result === null) {
-      if (!p.defaults) p.defaults = { [attr]: value };
-      else p.defaults[attr] = value;
-      return p;
-    }
-    const namespace = result[1];
-    const attribute = _.camelCase(result[2]);
-    if (namespace === 'opf') {
-      p[attribute] = attribute === 'role' ? OPF_ROLES[value].name : value;
-    } else if (!p[namespace]) {
-      p[namespace] = { [attribute]: value };
-    } else {
-      p[namespace][attribute] = value;
-    }
-    return p;
-  }, { value: t._ });
-  return data;
+const simpleTransform = {
+  assert: values => assert(
+    Array.isArray(values) && values.every(e => typeof e === 'string'),
+    `${values} must be set with an array of strings!`,
+  ),
+  iteratee: t => (typeof t === 'object' ? t._ : t),
+  inverseIteratee: t => t,
 };
 
-export const inverseOpfIterattee = (t, defaultAttrs) => {
-  const data = { _: t.value };
-  const attributes = Object.keys(t).reduce((p, v) => {
-    if (v === 'value') return p;
-    const value = t[v];
-    if (typeof value === 'object' && value !== undefined) {
-      const namespace = (v === 'defaults') ? '' : `${v}:`;
-      Object.keys(value).forEach((attr) => { p[`${namespace}${_.kebabCase(attr)}`] = value[attr]; });
-    } else {
-      p[`opf:${_.kebabCase(v)}`] = (v === 'role') ? (NAME_TO_OPF_CODE[value] || 'aut') : value;
+// returns object representing the xml element
+export const opfTransform = {
+  assert: values => assert(
+    Array.isArray(values) && values.every(e => typeof e === 'string' || (typeof e === 'object' && typeof e.value === 'string')),
+    `${values} must be set with an array of strings and/or objects { value, attrs... }!`,
+  ),
+  iteratee: (t) => {
+    if (typeof t !== 'object') {
+      return { value: t };
     }
-    return p;
-  }, {});
-  data.$ = { ...defaultAttrs, ...attributes };
-  return data;
+    const data = Object.keys(t.$).reduce((p, attr) => {
+      const value = t.$[attr];
+      const result = attr.match(/^(\w+):(\S+)/);
+      if (result === null) {
+        if (!p.defaults) p.defaults = { [attr]: value };
+        else p.defaults[attr] = value;
+        return p;
+      }
+      const namespace = result[1];
+      const attribute = _.camelCase(result[2]);
+      if (namespace === 'opf') {
+        p[attribute] = attribute === 'role' ? OPF_ROLES[value].name : value;
+      } else if (!p[namespace]) {
+        p[namespace] = { [attribute]: value };
+      } else {
+        p[namespace][attribute] = value;
+      }
+      return p;
+    }, { value: t._ });
+    return data;
+  },
+  inverseIteratee: (t, defaultAttrs) => {
+    const data = { _: t.value };
+    const attributes = Object.keys(t).reduce((p, v) => {
+      if (v === 'value') return p;
+      const value = t[v];
+      if (typeof value === 'object' && value !== undefined) {
+        const namespace = (v === 'defaults') ? '' : `${v}:`;
+        Object.keys(value).forEach((attr) => { p[`${namespace}${_.kebabCase(attr)}`] = value[attr]; });
+      } else {
+        p[`opf:${_.kebabCase(v)}`] = (v === 'role') ? (NAME_TO_OPF_CODE[value] || 'aut') : value;
+      }
+      return p;
+    }, {});
+    data.$ = { ...defaultAttrs, ...attributes };
+    return data;
+  }
 };
 
 // Extracted Opf metadata gets packaged into an OPF
@@ -73,15 +84,6 @@ export class OPF {
     this.data = parsedXmlDataToUse;
     this.metadata = this.data.package.metadata[0];
   }
-
-  // get allTitles() {
-  //   return this.getList('dc:title');
-  // }
-
-  // set allTitles(titles) {
-  //   assert(Array.isArray(titles) && titles.every(e => typeof e === 'string'), 'allTitles must be set with an array of strings!');
-  //   this.metadata['dc:title'] = titles;
-  // }
 
   get date() {
     // TO DO:
@@ -125,13 +127,6 @@ export class OPF {
     }));
   }
 
-  getList(name, iteratee = defaultXMLIteratee) {
-    if (Array.isArray(this.metadata[name])) {
-      return this.metadata[name].map(iteratee);
-    }
-    return undefined;
-  }
-
   getField(name, index = 0) {
     const field = this.metadata[name];
     if (field && Array.isArray(field) && field.length > index) {
@@ -164,12 +159,12 @@ const multipleDublinCoreProperties = [{
 }, {
   property: 'creator',
   alias: 'authors',
-  iteratee: opfIteratee,
+  transform: opfTransform,
   defaultAttrs: { 'opf:role': 'aut' },
 }, {
   property: 'contributor',
   alias: 'contributors',
-  iteratee: opfIteratee,
+  transform: opfTransform,
   defaultAttrs: { 'opf:role': 'clb' },
 }, {
   property: 'subject',
@@ -200,21 +195,21 @@ simpleDublinCoreProperties.forEach((property) => {
   Object.defineProperty(OPF.prototype, property, { get, set });
 });
 
-multipleDublinCoreProperties.forEach(({ property, alias, iteratee = defaultXMLIteratee, defaultAttrs = {} }) => {
+multipleDublinCoreProperties.forEach(({ property, alias, transform = simpleTransform, defaultAttrs }) => {
   const dcProperty = `dc:${property}`;
   function set(values) {
-    assert(Array.isArray(values) && values.every(e => typeof e === 'string' || (typeof e === 'object' && typeof e.value === 'string')), `${values} must be set with an array of strings and/or objects { value, attrs... }!`);
+    transform.assert(values);
     // expect array of objects, or strings,
     this.metadata[dcProperty] = values.map((e) => {
       if (typeof e === 'string') {
-        return { $: defaultAttrs, _: e.value };
+        return defaultAttrs ? { $: defaultAttrs, _: e } : e;
       }
-      return inverseOpfIterattee(e, defaultAttrs);
+      return transform.inverseIteratee(e, defaultAttrs);
     });
   }
   function get() {
     const field = this.metadata[dcProperty];
-    return (field) ? field.map(iteratee) : undefined;
+    return (field) ? field.map(transform.iteratee) : undefined;
   }
   Object.defineProperty(OPF.prototype, alias, { get, set });
 });
