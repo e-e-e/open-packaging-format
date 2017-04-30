@@ -49,9 +49,9 @@ export const opfIteratee = (t) => {
   return data;
 };
 
-export const inverseOpfIterattee = (t) => {
+export const inverseOpfIterattee = (t, defaultAttrs) => {
   const data = { _: t.value };
-  data.$ = Object.keys(t).reduce((p, v) => {
+  const attributes = Object.keys(t).reduce((p, v) => {
     if (v === 'value') return p;
     const value = t[v];
     if (typeof value === 'object' && value !== undefined) {
@@ -62,6 +62,7 @@ export const inverseOpfIterattee = (t) => {
     }
     return p;
   }, {});
+  data.$ = { ...defaultAttrs, ...attributes };
   return data;
 };
 
@@ -73,50 +74,14 @@ export class OPF {
     this.metadata = this.data.package.metadata[0];
   }
 
-  get allTitles() {
-    return this.getList('dc:title');
-  }
+  // get allTitles() {
+  //   return this.getList('dc:title');
+  // }
 
-  set allTitles(titles) {
-    assert(Array.isArray(titles) && titles.every(e => typeof e === 'string'), 'allTitles must be set with an array of strings!');
-    this.metadata['dc:title'] = titles;
-  }
-
-  get authors() {
-    return this.getList('dc:creator', opfIteratee);
-  }
-
-  set authors(authors) {
-    assert(Array.isArray(authors) && authors.every(e => typeof e === 'string' || (typeof e === 'object' && typeof e.value === 'string')), 'authors must be set with an array of strings and/or objects { value, role }!');
-    // expect array of objects, or strings,
-    this.metadata['dc:creator'] = authors.map((author) => {
-      if (typeof author === 'string') {
-        return { $: { 'opf:role': 'aut' }, _: author.value };
-      }
-      return inverseOpfIterattee(author);
-    });
-  }
-
-  get contributors() {
-    return this.getList('dc:contributor', opfIteratee);
-  }
-
-  set contributors(contributors) {
-    // TODO: abstract code from authors for reuse here.
-    console.log(contributors);
-  }
-
-  get publishers() {
-    return this.getList('dc:publishers');
-  }
-
-  get subjects() {
-    return this.getList('dc:subject');
-  }
-
-  get languages() {
-    return this.getList('dc:language');
-  }
+  // set allTitles(titles) {
+  //   assert(Array.isArray(titles) && titles.every(e => typeof e === 'string'), 'allTitles must be set with an array of strings!');
+  //   this.metadata['dc:title'] = titles;
+  // }
 
   get date() {
     // TO DO:
@@ -183,7 +148,40 @@ export class OPF {
 
 // Attach getter and setters to OPF programmatically based on expected metadata;
 
-const simpleDublinCoreProperties = ['title', 'description', 'type', 'format', 'coverage', 'rights', 'source'];
+const simpleDublinCoreProperties = [
+  'title',
+  'description',
+  'type',
+  'format',
+  'coverage',
+  'rights',
+  'source',
+];
+
+const multipleDublinCoreProperties = [{
+  property: 'title',
+  alias: 'titles',
+}, {
+  property: 'creator',
+  alias: 'authors',
+  iteratee: opfIteratee,
+  defaultAttrs: { 'opf:role': 'aut' },
+}, {
+  property: 'contributor',
+  alias: 'contributors',
+  iteratee: opfIteratee,
+  defaultAttrs: { 'opf:role': 'clb' },
+}, {
+  property: 'subject',
+  alias: 'subjects',
+}, {
+  property: 'publisher',
+  alias: 'publishers',
+},
+{
+  property: 'language',
+  alias: 'languages',
+}];
 
 simpleDublinCoreProperties.forEach((property) => {
   const dcProperty = `dc:${property}`;
@@ -196,9 +194,29 @@ simpleDublinCoreProperties.forEach((property) => {
     }
   }
   function get() {
-    return this.getField(dcProperty);
+    const field = this.metadata[dcProperty];
+    return (field) ? field[0] : undefined;
   }
   Object.defineProperty(OPF.prototype, property, { get, set });
+});
+
+multipleDublinCoreProperties.forEach(({ property, alias, iteratee = defaultXMLIteratee, defaultAttrs = {} }) => {
+  const dcProperty = `dc:${property}`;
+  function set(values) {
+    assert(Array.isArray(values) && values.every(e => typeof e === 'string' || (typeof e === 'object' && typeof e.value === 'string')), `${values} must be set with an array of strings and/or objects { value, attrs... }!`);
+    // expect array of objects, or strings,
+    this.metadata[dcProperty] = values.map((e) => {
+      if (typeof e === 'string') {
+        return { $: defaultAttrs, _: e.value };
+      }
+      return inverseOpfIterattee(e, defaultAttrs);
+    });
+  }
+  function get() {
+    const field = this.metadata[dcProperty];
+    return (field) ? field.map(iteratee) : undefined;
+  }
+  Object.defineProperty(OPF.prototype, alias, { get, set });
 });
 
 // Parses an opf file

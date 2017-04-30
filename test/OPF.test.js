@@ -111,7 +111,7 @@ describe('inverseOpfIterattee', () => {
         class: 'extra',
       },
       _: 'value',
-    },{
+    }, {
       $: {
         'opf:name': 'Judith, Butler',
         'opf:file-as': 'Butler, Judith',
@@ -244,18 +244,18 @@ describe('OPF class', () => {
     it('can have a multiple titles set', () => {
       const opf = new OPF();
       const titles = ['This is a good title', 'and an ok subtitle'];
-      opf.allTitles = titles;
+      opf.titles = titles;
       expect(opf.title).to.eql(titles[0]);
-      expect(opf.allTitles).to.eql(titles);
+      expect(opf.titles).to.eql(titles);
     });
 
     it('primary title can be set directly, this will not effect subtitles', () => {
       const opf = new OPF();
       const titles = ['This is a good title', 'and an ok subtitle'];
-      opf.allTitles = titles;
+      opf.titles = titles;
       opf.title = titles[0];
       expect(opf.title).to.eql(titles[0]);
-      expect(opf.allTitles).to.eql(titles);
+      expect(opf.titles).to.eql(titles);
     });
 
     it('sets authors with an array of strings or objects: { value, role, fileAs }', () => {
@@ -306,10 +306,10 @@ describe('OPF class', () => {
     erroredTypes.forEach(t => expect(() => { opf.title = t; }).to.throw(Error, /must be set with a string!/));
   });
 
-  it('throws error if you try and set allTitles as anything but array', () => {
+  it('throws error if you try and set titles as anything but array', () => {
     const opf = new OPF();
     const erroredTypes = ['ok', 1, [3, {}], {}, null, undefined, NaN];
-    erroredTypes.forEach(t => expect(() => { opf.allTitles = t; }).to.throw(Error, /must be set with an array of strings!/));
+    erroredTypes.forEach(t => expect(() => { opf.titles = t; }).to.throw(Error, /must be set with an array of strings!/));
   });
 
 });
