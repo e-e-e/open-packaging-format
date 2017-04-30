@@ -128,7 +128,6 @@ export class OPF {
     );
     const uuidIndex = ids.findIndex(id => id.id); // find id with id key
     assert(uuidIndex !== -1, 'At least one identifier must contain truthy id key');
-    console.log(uuidIndex, ids[uuidIndex]);
     this.uniqueIdentifierKey = `${ids[uuidIndex].scheme}_id`;
     this.metadata['dc:identifier'] = ids.map((v, i) => {
       if (i === uuidIndex) {
