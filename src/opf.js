@@ -19,19 +19,33 @@ function assert(condition, message) {
   }
 }
 
+// returns only the child value of the xml element
 const defaultXMLIteratee = t => (typeof t === 'object' ? t._ : t);
 
-const opfIteratee = (t) => {
+// returns object representing the xml element
+export const opfIteratee = (t) => {
   if (typeof t !== 'object') {
     return { value: t };
   }
-  const data = { value: t._ };
-  const opfAttrs = typeof t.$ === 'object' ? Object.keys(t.$).filter(key => /^opf:/.test(key)) : [];
-  opfAttrs.forEach((attr) => {
-    const name = _.camelCase(attr.slice(4));
+  const data = Object.keys(t.$).reduce((p, attr) => {
     const value = t.$[attr];
-    data[name] = name === 'role' ? OPF_ROLES[value].name : value;
-  });
+    const result = attr.match(/^(\w+):(\S+)/);
+    if (result === null) {
+      if (!p.defaults) p.defaults = { [attr]: value };
+      else p.defaults[attr] = value;
+      return p;
+    }
+    const namespace = result[1];
+    const attribute = _.camelCase(result[2]);
+    if (namespace === 'opf') {
+      p[attribute] = attribute === 'role' ? OPF_ROLES[value].name : value;
+    } else if (!p[namespace]) {
+      p[namespace] = { [attribute]: value };
+    } else {
+      p[namespace][attribute] = value;
+    }
+    return p;
+  }, { value: t._ });
   return data;
 };
 
