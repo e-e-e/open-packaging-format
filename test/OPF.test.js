@@ -1,6 +1,5 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import chaiIterator from 'chai-iterator';
 import path from 'path';
 
 import * as fs from '../src/fsAsync.js';
@@ -9,7 +8,6 @@ import { readOPF, OPF, opfTransform } from '../src/opf.js';
 
 chai.should();
 chai.use(chaiAsPromised);
-chai.use(chaiIterator);
 const expect = chai.expect;
 
 describe('opfTransform -', () => {
