@@ -49,6 +49,22 @@ export const opfIteratee = (t) => {
   return data;
 };
 
+export const inverseOpfIterattee = (t) => {
+  const data = { _: t.value };
+  data.$ = Object.keys(t).reduce((p, v) => {
+    if (v === 'value') return p;
+    const value = t[v];
+    if (typeof value === 'object' && value !== undefined) {
+      const namespace = (v === 'defaults') ? '' : `${v}:`;
+      Object.keys(value).forEach((attr) => { p[`${namespace}${_.kebabCase(attr)}`] = value[attr]; });
+    } else {
+      p[`opf:${_.kebabCase(v)}`] = (v === 'role') ? (NAME_TO_OPF_CODE[value] || 'aut') : value;
+    }
+    return p;
+  }, {});
+  return data;
+};
+
 // Extracted Opf metadata gets packaged into an OPF
 export class OPF {
   constructor(parsedXmlData) {
@@ -74,18 +90,10 @@ export class OPF {
     assert(Array.isArray(authors) && authors.every(e => typeof e === 'string' || (typeof e === 'object' && typeof e.value === 'string')), 'authors must be set with an array of strings and/or objects { value, role }!');
     // expect array of objects, or strings,
     this.metadata['dc:creator'] = authors.map((author) => {
-      const data = { $: {}, _: author.value };
       if (typeof author === 'string') {
-        data.$['opf:role'] = 'aut';
-      } else {
-        data.$ = _.keys(author).reduce((p, v) => {
-          if (v !== 'value') {
-            p[`opf:${_.kebabCase(v)}`] = (v === 'role') ? NAME_TO_OPF_CODE[author[v]] || 'aut' : author[v];
-          }
-          return p;
-        }, {});
+        return { $: { 'opf:role': 'aut' }, _: author.value };
       }
-      return data;
+      return inverseOpfIterattee(author);
     });
   }
 

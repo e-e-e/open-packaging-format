@@ -5,7 +5,7 @@ import path from 'path';
 
 import * as fs from '../src/fsAsync.js';
 import { OPF_DEFAULT } from '../src/constants.js';
-import { readOPF, OPF, opfIteratee } from '../src/opf.js';
+import { readOPF, OPF, opfIteratee, inverseOpfIterattee } from '../src/opf.js';
 
 chai.should();
 chai.use(chaiAsPromised);
@@ -87,6 +87,66 @@ describe('opfIteratee', () => {
 
   it('it breaks if given an array as an argument', () => {
     expect(() => opfIteratee([])).to.throw(Error);
+  });
+});
+
+describe('inverseOpfIterattee', () => {
+  it('returns the input of opfIteratee when passed the output as an argument', () => {
+    const inputs = [{
+      $: {},
+      _: 'value',
+    },
+    {
+      $: {
+        'opf:name': 'Judith, Butler',
+        'opf:file-as': 'Butler, Judith',
+      },
+      _: 'value',
+    },
+    {
+      $: {
+        'test:name': 'Judith, Butler',
+        'dc:file-as': 'Butler, Judith',
+        id: 'test',
+        class: 'extra',
+      },
+      _: 'value',
+    },{
+      $: {
+        'opf:name': 'Judith, Butler',
+        'opf:file-as': 'Butler, Judith',
+        'opf:role': 'aui',
+      },
+      _: 'value',
+    }];
+    const outputs = [{
+      value: 'value',
+    },
+    {
+      name: 'Judith, Butler',
+      fileAs: 'Butler, Judith',
+      value: 'value',
+    },
+    {
+      test: {
+        name: 'Judith, Butler',
+      },
+      dc: {
+        fileAs: 'Butler, Judith',
+      },
+      defaults: {
+        id: 'test',
+        class: 'extra',
+      },
+      value: 'value',
+    },
+    {
+      name: 'Judith, Butler',
+      fileAs: 'Butler, Judith',
+      value: 'value',
+      role: 'Author of introduction, etc.',
+    }];
+    outputs.forEach((output, index) => expect(inverseOpfIterattee(output)).to.eql(inputs[index]));
   });
 });
 
