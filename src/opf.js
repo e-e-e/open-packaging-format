@@ -25,7 +25,7 @@ const simpleTransform = {
     `${values} must be set with an array of strings!`,
   ),
   iteratee: t => (typeof t === 'object' ? t._ : t),
-  inverseIteratee: t => t,
+  inverseIteratee: (t, defaultAttrs) => (defaultAttrs ? { $: defaultAttrs, _: t } : t),
 };
 
 // returns object representing the xml element
@@ -117,7 +117,7 @@ export class OPF {
   }
 
   set identifiers(ids) {
-    // TODO: need to assert that one of these has an id and that that id is equal to packas's unique-identifier attr.
+    // TODO: need to assert that one of these has an id and that that id is equal to packages's unique-identifier attr.
     assert(typeof ids === 'object', 'identifiers to be set as a key, value object, eg. { scheme: id }');
     this.metadata['dc:identifier'] = _.map(ids, (id, scheme) => ({
       $: {
@@ -199,13 +199,7 @@ multipleDublinCoreProperties.forEach(({ property, alias, transform = simpleTrans
   const dcProperty = `dc:${property}`;
   function set(values) {
     transform.assert(values);
-    // expect array of objects, or strings,
-    this.metadata[dcProperty] = values.map((e) => {
-      if (typeof e === 'string') {
-        return defaultAttrs ? { $: defaultAttrs, _: e } : e;
-      }
-      return transform.inverseIteratee(e, defaultAttrs);
-    });
+    this.metadata[dcProperty] = values.map(v => transform.inverseIteratee(v, defaultAttrs));
   }
   function get() {
     const field = this.metadata[dcProperty];
