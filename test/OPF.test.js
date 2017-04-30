@@ -198,13 +198,25 @@ describe('OPF class', () => {
       expect(opf.subjects).to.include('Philosophy');
     });
 
-    it('has property identifiers which is an iterator', () => {
-      expect(opf.identifiers).to.be.iterable;
-      expect(opf.identifiers).to.iterate.for.lengthOf(3);
-      expect(opf.identifiers).to.deep.iterate.from([
-        { calibre: '20' },
-        { uuid: 'fb308377-e17b-4d7b-8f77-cf0657a86c11' },
-        { ARG: '51c584186c3a0ed90bcd0800.1' },
+    it('has property identifiers which is an array of objects {scheme, value, id(optional) } where id is truthy if it is equal to the packages unique-identifier', () => {
+      expect(opf.identifiers).to.deep.equal([
+        {
+          defaults: {
+            id: 'calibre_id',
+          },
+          scheme: 'calibre',
+          value: '20',
+        }, {
+          defaults: {
+            id: 'uuid_id',
+          },
+          id: 'uuid_id',
+          scheme: 'uuid',
+          value: 'fb308377-e17b-4d7b-8f77-cf0657a86c11',
+        }, {
+          scheme: 'ARG',
+          value: '51c584186c3a0ed90bcd0800.1',
+        },
       ]);
     });
   });
@@ -225,15 +237,9 @@ describe('OPF class', () => {
         'languages',
         'source',
         'type',
+        'identifiers',
       ];
-      for (const property in properties) {
-        expect(opf[property]).to.eql(undefined);
-      }
-    });
-
-    it('has identifiers which is an empty iterator', () => {
-      expect(opf.identifiers).to.be.iterable;
-      expect(opf.identifiers).to.iterate.for.lengthOf(0);
+      properties.forEach(property => expect(opf[property]).to.eql(undefined));
     });
   });
 
@@ -247,8 +253,6 @@ describe('OPF class', () => {
       const opf = new OPF();
       const titles = ['This is a good title', 'and an ok subtitle'];
       opf.titles = titles;
-      console.log(opf.titles);
-      console.log(opf.title);
       expect(opf.title).to.eql(titles[0]);
       expect(opf.titles).to.eql(titles);
     });
@@ -283,18 +287,58 @@ describe('OPF class', () => {
       expect(opf.description).to.eql(description);
     });
 
-    it('sets multiple custom identifiers via key: value paired object', () => {
+    it('sets multiple custom identifiers with for array [{scheme, value, id:true (optional)}]', () => {
       const opf = new OPF();
-      opf.identifiers = {
-        calibre: '2341455',
-        aaarg: 'sa234324',
+      opf.identifiers = [{
+        scheme: 'calibre',
+        value: '2341455',
+      }, {
+        id: true,
+        scheme: 'ARG',
+        value: 'sa234324',
+      }];
+      expect(opf.identifiers).to.be.instanceOf(Array);
+      expect(opf.identifiers).to.have.length(2);
+      expect(opf.identifiers).to.deep.equal([{
+        scheme: 'calibre',
+        value: '2341455',
+      }, {
+        defaults: {
+          id: 'ARG_id',
+        },
+        id: 'ARG_id',
+        scheme: 'ARG',
+        value: 'sa234324',
+      }]);
+    });
+
+    it('throws error if no id is set with identifiers', () => {
+      const opf = new OPF();
+      const fn = () => {
+        opf.identifiers = [{
+          scheme: 'calibre',
+          value: '2341455',
+        }, {
+          scheme: 'ARG',
+          value: 'sa234324',
+        }];
       };
-      expect(opf.identifiers).to.be.iterable;
-      expect(opf.identifiers).to.iterate.for.lengthOf(2);
-      expect(opf.identifiers).to.deep.iterate.from([
-        { calibre: '2341455' },
-        { aaarg: 'sa234324' },
-      ]);
+      expect(fn).to.throw(Error, /At least one identifier must contain truthy id key/);
+    });
+
+    it('throws error identifiers are set with anything other than array of objects with scheme and value keys', () => {
+      const opf = new OPF();
+      const badArgs = [
+        [{ value: '2341455' }],
+        [{ scheme: 'ARG' }],
+        2,
+        'this',
+        {},
+        NaN,
+      ];
+      badArgs.forEach(v =>
+        expect(() => { opf.identifiers = v; }).to.throw(Error, /identifiers must be set with an array of objects with scheme and value keys/),
+      );
     });
 
     it('should return the default.opf XML with toXML() method', async () => {

@@ -85,6 +85,15 @@ export class OPF {
     this.metadata = this.data.package.metadata[0];
   }
 
+  get uniqueIdentifierKey() {
+    return this.data.package.$['unique-identifier'];
+  }
+
+  set uniqueIdentifierKey(value) {
+    if (!this.data.package.$) this.data.package.$ = { 'unique-identifier': value };
+    else this.data.package.$['unique-identifier'] = value;
+  }
+
   get date() {
     // TO DO:
     // opf-event data should be fetched as well.
@@ -100,31 +109,34 @@ export class OPF {
   }
 
   get identifiers() {
-    const ids = {};
-    const obj = this.metadata;
-    ids[Symbol.iterator] = function* () {
-      if (Array.isArray(obj['dc:identifier'])) {
-        for (const i of obj['dc:identifier']) {
-          if ('$' in i && '_' in i && 'opf:scheme' in i.$) {
-            const id = {};
-            id[i.$['opf:scheme']] = i._;
-            yield id;
-          }
-        }
-      }
-    };
-    return ids;
+    const field = this.metadata['dc:identifier'];
+    return (field)
+      ? field.map((v) => {
+        const transformed = opfTransform.iteratee(v);
+        if (v.$.id === this.uniqueIdentifierKey) transformed.id = this.uniqueIdentifierKey;
+        return transformed;
+      })
+      : undefined;
   }
 
   set identifiers(ids) {
-    // TODO: need to assert that one of these has an id and that that id is equal to packages's unique-identifier attr.
-    assert(typeof ids === 'object', 'identifiers to be set as a key, value object, eg. { scheme: id }');
-    this.metadata['dc:identifier'] = _.map(ids, (id, scheme) => ({
-      $: {
-        'opf:scheme': scheme,
-      },
-      _: id,
-    }));
+    assert(
+      Array.isArray(ids) &&
+      ids.every(id => (typeof id === 'object' && id.scheme !== undefined && id.value !== undefined)),
+      'identifiers must be set with an array of objects with scheme and value keys',
+    );
+    const uuidIndex = ids.findIndex(id => id.id); // find id with id key
+    assert(uuidIndex !== -1, 'At least one identifier must contain truthy id key');
+    console.log(uuidIndex, ids[uuidIndex]);
+    this.uniqueIdentifierKey = `${ids[uuidIndex].scheme}_id`;
+    this.metadata['dc:identifier'] = ids.map((v, i) => {
+      if (i === uuidIndex) {
+        delete v.id;
+        if (v.defaults) v.defaults.id = this.uniqueIdentifierKey;
+        else v.defaults = { id: this.uniqueIdentifierKey };
+      }
+      return opfTransform.inverseIteratee(v);
+    });
   }
 
   getField(name, index = 0) {
@@ -172,8 +184,7 @@ const multipleDublinCoreProperties = [{
 }, {
   property: 'publisher',
   alias: 'publishers',
-},
-{
+}, {
   property: 'language',
   alias: 'languages',
 }];
