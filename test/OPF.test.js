@@ -216,6 +216,11 @@ describe('OPF class', () => {
           value: '51c584186c3a0ed90bcd0800.1',
         },
       ]);
+
+      it('the date property returns a single js date object', () => {
+        expect(opf.date).to.be.instanceOf(Date);
+        expect(opf.date.getFullYear()).to.eql(2016);
+      });
     });
   });
 
@@ -236,6 +241,7 @@ describe('OPF class', () => {
         'source',
         'type',
         'identifiers',
+        'date',
       ];
       properties.forEach(property => expect(opf[property]).to.eql(undefined));
     });
@@ -310,33 +316,10 @@ describe('OPF class', () => {
       }]);
     });
 
-    it('throws error if no id is set with identifiers', () => {
+    it('sets date when passed a new Date object', () => {
       const opf = new OPF();
-      const fn = () => {
-        opf.identifiers = [{
-          scheme: 'calibre',
-          value: '2341455',
-        }, {
-          scheme: 'ARG',
-          value: 'sa234324',
-        }];
-      };
-      expect(fn).to.throw(Error, /At least one identifier must contain truthy id key/);
-    });
-
-    it('throws error identifiers are set with anything other than array of objects with scheme and value keys', () => {
-      const opf = new OPF();
-      const badArgs = [
-        [{ value: '2341455' }],
-        [{ scheme: 'ARG' }],
-        2,
-        'this',
-        {},
-        NaN,
-      ];
-      badArgs.forEach(v =>
-        expect(() => { opf.identifiers = v; }).to.throw(Error, /identifiers must be set with an array of objects with scheme and value keys/),
-      );
+      opf.date = new Date(2016, 11);
+      expect(opf.date.getFullYear()).to.equal(2016);
     });
 
     it('should return the default.opf XML with toXML() method', async () => {
@@ -358,4 +341,32 @@ describe('OPF class', () => {
     erroredTypes.forEach(t => expect(() => { opf.titles = t; }).to.throw(Error, /must be set with an array of strings!/));
   });
 
+  it('throws error if no id is set with identifiers', () => {
+    const opf = new OPF();
+    const fn = () => {
+      opf.identifiers = [{
+        scheme: 'calibre',
+        value: '2341455',
+      }, {
+        scheme: 'ARG',
+        value: 'sa234324',
+      }];
+    };
+    expect(fn).to.throw(Error, /At least one identifier must contain truthy id key/);
+  });
+
+  it('throws error identifiers are set with anything other than array of objects with scheme and value keys', () => {
+    const opf = new OPF();
+    const badArgs = [
+      [{ value: '2341455' }],
+      [{ scheme: 'ARG' }],
+      2,
+      'this',
+      {},
+      NaN,
+    ];
+    badArgs.forEach(v =>
+      expect(() => { opf.identifiers = v; }).to.throw(Error, /identifiers must be set with an array of objects with scheme and value keys/),
+    );
+  });
 });

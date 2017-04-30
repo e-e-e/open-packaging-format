@@ -98,14 +98,15 @@ export class OPF {
     // TO DO:
     // opf-event data should be fetched as well.
     // detect and convert to date object (YYYY[-MM[-DD]])
-    return this.getField('dc:date');
+    const field = this.metadata['dc:date'];
+    return field ? new Date(this.metadata['dc:date'][0]) : undefined;
   }
 
   set date(date) {
     // TO DO:
     // opf-event data should be fetched as well.
     // detect and convert to date object (YYYY[-MM[-DD]])
-    this.metadata['dc:date'] = [date];
+    this.metadata['dc:date'] = [date.toISOString()];
   }
 
   get identifiers() {
@@ -137,14 +138,6 @@ export class OPF {
       }
       return opfTransform.inverseIteratee(v);
     });
-  }
-
-  getField(name, index = 0) {
-    const field = this.metadata[name];
-    if (field && Array.isArray(field) && field.length > index) {
-      return this.metadata[name][index];
-    }
-    return undefined;
   }
 
   toXML() {
