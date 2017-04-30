@@ -74,7 +74,7 @@ export const opfTransform = {
     }, {});
     data.$ = { ...defaultAttrs, ...attributes };
     return data;
-  }
+  },
 };
 
 // Extracted Opf metadata gets packaged into an OPF
