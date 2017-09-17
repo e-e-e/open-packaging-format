@@ -1,6 +1,14 @@
 {
-  "presets": ["stage-3"],
-  "plugins": ["transform-es2015-modules-commonjs", "transform-class-properties"],
-  "ignore": [],
-  "retainLines": 'true',
+  "env": {
+    "production": {
+      "presets": ["stage-3"],
+      "plugins": ["transform-class-properties"],
+      "ignore": [],
+    },
+    "test": {
+      "presets": ["stage-3"],
+      "plugins": ["transform-es2015-modules-commonjs", "transform-class-properties"],
+      "ignore": [],
+    }
+  }
 }

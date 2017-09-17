@@ -2,9 +2,9 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import path from 'path';
 
-import * as fs from '../src/fsAsync.js';
-import { OPF_DEFAULT } from '../src/constants.js';
-import { readOPF, OPF } from '../src/opf.js';
+import * as fs from '../src/fsAsync';
+import { OPF_DEFAULT } from '../src/constants';
+import { readOPF, OPF } from '../src/opf';
 
 chai.should();
 chai.use(chaiAsPromised);

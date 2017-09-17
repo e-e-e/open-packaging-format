@@ -9,14 +9,15 @@
     "ebooks",
     "metadata"
   ],
-  "main": "index.js",
+  "main": "dist/opf.cjs.js",
+  "module": "dist/opf.js",
   "scripts": {
     "prepublish": "npm run build",
-    "build": "npm run babel",
-    "babel": "rm -rf ./dist && babel src --out-dir dist --copy-files",
-    "dev": "rm -rf ./dist && babel --source-maps -w src --out-dir dist --copy-files",
-    "test": "mocha --compilers js:babel-register ",
-    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha -- --compilers js:babel-core/register"
+    "build": "npm run rollup",
+    "rollup": "rm -rf ./dist && NODE_ENV=production rollup --config rollup.config.js",
+    "dev": "rm -rf ./dist && && NODE_ENV=production rollup -w --config rollup.config.js",
+    "test": "NODE_ENV=test mocha --compilers js:babel-register ",
+    "test-travis": "NODE_ENV=test istanbul cover node_modules/mocha/bin/_mocha -- --compilers js:babel-core/register"
   },
   "author": {
     "name": "Benjamin Forster"
@@ -53,6 +54,10 @@
     "eslint-plugin-react": "^6.9.0",
     "istanbul": "^1.0.0-alpha.2",
     "mocha": "^3.3.0",
+    "rollup": "^0.50.0",
+    "rollup-plugin-babel": "^3.0.2",
+    "rollup-plugin-commonjs": "^8.2.1",
+    "rollup-plugin-node-resolve": "^3.0.0",
     "sinon": "^2.1.0"
   },
   "dependencies": {

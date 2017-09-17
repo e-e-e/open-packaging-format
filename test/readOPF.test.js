@@ -3,7 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import chaiIterator from 'chai-iterator';
 import path from 'path';
 
-import { readOPF, OPF } from '../src/opf.js';
+import { readOPF, OPF } from '../src/opf';
 
 chai.should();
 chai.use(chaiAsPromised);

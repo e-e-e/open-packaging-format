@@ -2,8 +2,8 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import sinon from 'sinon';
 
-import { OPF, writeOPF } from '../src/opf.js';
-import * as fs from '../src/fsAsync.js';
+import * as fs from '../src/fsAsync';
+import { OPF, writeOPF } from '../src/opf';
 
 chai.should();
 chai.use(chaiAsPromised);
