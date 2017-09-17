@@ -85,60 +85,69 @@ describe('opfTransform', () => {
 
   describe('inverseIteratee', () => {
     it('returns the input of iteratee when passed the output as an argument', () => {
-      const inputs = [{
-        $: {},
-        _: 'value',
-      },
-      {
-        $: {
-          'opf:name': 'Judith, Butler',
-          'opf:file-as': 'Butler, Judith',
+      const inputs = [
+        {
+          $: {},
+          _: 'value',
         },
-        _: 'value',
-      },
-      {
-        $: {
-          'test:name': 'Judith, Butler',
-          'dc:file-as': 'Butler, Judith',
-          id: 'test',
-          class: 'extra',
+        {
+          $: {
+            'opf:name': 'Judith, Butler',
+            'opf:file-as': 'Butler, Judith',
+          },
+          _: 'value',
         },
-        _: 'value',
-      }, {
-        $: {
-          'opf:name': 'Judith, Butler',
-          'opf:file-as': 'Butler, Judith',
-          'opf:role': 'aui',
+        {
+          $: {
+            'test:name': 'Judith, Butler',
+            'dc:file-as': 'Butler, Judith',
+            id: 'test',
+            class: 'extra',
+          },
+          _: 'value',
+        }, {
+          $: {
+            'opf:name': 'Judith, Butler',
+            'opf:file-as': 'Butler, Judith',
+            'opf:role': 'aui',
+          },
+          _: 'value',
         },
-        _: 'value',
-      }];
-      const outputs = [{
-        value: 'value',
-      },
-      {
-        name: 'Judith, Butler',
-        fileAs: 'Butler, Judith',
-        value: 'value',
-      },
-      {
-        test: {
+        {
+          $: undefined,
+          _: 'Anne Marsh',
+        },
+      ];
+      const outputs = [
+        {
+          value: 'value',
+        },
+        {
           name: 'Judith, Butler',
-        },
-        dc: {
           fileAs: 'Butler, Judith',
+          value: 'value',
         },
-        defaults: {
-          id: 'test',
-          class: 'extra',
+        {
+          test: {
+            name: 'Judith, Butler',
+          },
+          dc: {
+            fileAs: 'Butler, Judith',
+          },
+          defaults: {
+            id: 'test',
+            class: 'extra',
+          },
+          value: 'value',
         },
-        value: 'value',
-      },
-      {
-        name: 'Judith, Butler',
-        fileAs: 'Butler, Judith',
-        value: 'value',
-        role: 'Author of introduction, etc.',
-      }];
+        {
+          name: 'Judith, Butler',
+          fileAs: 'Butler, Judith',
+          value: 'value',
+          role: 'Author of introduction, etc.',
+        },
+        'Anne Marsh',
+      ];
       outputs.forEach((output, index) => expect(opfTransform.inverseIteratee(output)).to.eql(inputs[index]));
     });
   });

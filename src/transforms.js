@@ -43,6 +43,7 @@ export const opfTransform = {
     return data;
   },
   inverseIteratee: (t, defaultAttrs) => {
+    if (typeof t === 'string') return { _: t, $: defaultAttrs };
     const data = { _: t.value };
     const attributes = Object.keys(t).reduce((p, v) => {
       if (v === 'value') return p;

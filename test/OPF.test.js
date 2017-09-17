@@ -229,4 +229,36 @@ describe('OPF class', () => {
       expect(() => { opf.identifiers = v; }).to.throw(Error, /identifiers must be set with an array of objects with scheme and value keys/),
     );
   });
+  describe('opf#merge function', () => {
+    it('takes an object and assigns its values to the opf', () => {
+      const obj = {
+        uniqueIdentifierKey: 'uuid',
+        title: 'Gender Trouble',
+        authors: ['Judith Butler', 'Ann Marsh'],
+      };
+      const opf = new OPF();
+      opf.merge(obj);
+      expect(opf.uniqueIdentifierKey).to.eql('uuid');
+      expect(opf.title).to.eql('Gender Trouble');
+      expect(opf.authors).to.eql([{
+        value: 'Judith Butler',
+        role: 'Author',
+      },
+      {
+        value: 'Ann Marsh',
+        role: 'Author',
+      }]);
+    });
+
+    it('does not merge attributes that are not settable on OPF', () => {
+      const obj = {
+        thisIsNotValid: 'uuid',
+        title: 'but this is',
+      };
+      const opf = new OPF();
+      opf.merge(obj);
+      expect(opf.thisIsNotValid).to.eql(undefined);
+      expect(opf.title).to.eql('but this is');
+    });
+  });
 });

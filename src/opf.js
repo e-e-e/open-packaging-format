@@ -24,6 +24,17 @@ export class OPF {
     this.metadata = this.data.package.metadata[0];
   }
 
+  merge(obj) {
+    _.each(obj, (value, key) => {
+      const description = Object.getOwnPropertyDescriptor(OPF.prototype, key);
+      if (description && description.set) {
+        this[key] = value;
+      } else {
+        console.warn('Can’t set', key, 'because OPF has no setter method associated with that key');
+      }
+    });
+  }
+
   get uniqueIdentifierKey() {
     return this.data.package.$['unique-identifier'];
   }
