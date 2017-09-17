@@ -8,7 +8,7 @@ import _ from 'lodash';
 
 import * as fs from './fsAsync';
 import assert from './assert';
-import { simpleTransform, opfTransform } from './transforms';
+import { simpleTransform, opfTransform, metaTagsMap } from './transforms';
 
 import { OPF_DEFAULT } from './constants';
 
@@ -39,24 +39,13 @@ export class OPF {
   get meta() {
     if (this.metaTags) return this.metaTags;
     if (this.metadata.meta === undefined) return undefined;
-    this.metaTags = this.metadata.meta.reduce((p, v) => {
-      const { name, content } = v.$;
-      const result = name.match(/^(\w+):(\S+)/);
-      if (result === null) {
-        // not namespaced
-        p[name] = content;
-      } else {
-        const namespace = result[1];
-        const attr = _.camelCase(result[2]);
-        if (p[namespace]) {
-          p[namespace][attr] = content;
-        } else {
-          p[namespace] = { [attr]: content };
-        }
-      }
-      return p;
-    }, {});
+    this.metaTags = metaTagsMap.toObject(this.metadata.meta);
     return this.metaTags;
+  }
+
+  set meta(obj) {
+    // modify internal state
+    this.metaTags = obj;
   }
 
   get uniqueIdentifierKey() {
@@ -114,6 +103,10 @@ export class OPF {
   }
 
   toXML() {
+    if (this.metaTags) {
+      // reinject metaTags back into xml structure before building
+      this.metadata.meta = metaTagsMap.fromObject(this.metaTags);
+    }
     this.data.package.metadata = [this.metadata];
     return builder.buildObject(this.data);
   }

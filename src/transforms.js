@@ -11,6 +11,38 @@ export const simpleTransform = {
   inverseIteratee: (t, defaultAttrs) => (defaultAttrs ? { $: defaultAttrs, _: t } : t),
 };
 
+export const metaTagsMap = {
+  toObject: meta => (
+    meta.reduce((p, v) => {
+      const { name, content } = v.$;
+      const result = name.match(/^(\w+):(\S+)/);
+      let namespace = 'defaults';
+      let attr = name;
+      if (result !== null) {
+        namespace = result[1];
+        attr = _.camelCase(result[2]);
+      }
+      if (p[namespace]) {
+        p[namespace][attr] = content;
+      } else {
+        p[namespace] = { [attr]: content };
+      }
+      return p;
+    }, {})
+  ),
+  fromObject: meta => (
+    _.flatMap(meta, (attrs, namespace) => {
+      const namespaced = (namespace === 'defaults') ? '' : `${namespace}:`;
+      return _.map(attrs, (value, attr) => ({
+        $: {
+          name: `${namespaced}${_.snakeCase(attr)}`,
+          content: JSON.stringify(value),
+        },
+      }));
+    })
+  ),
+};
+
 // returns object representing the xml element
 export const opfTransform = {
   assert: values => assert(

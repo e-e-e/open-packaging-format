@@ -7,4 +7,10 @@ o.authors = [{
   fileAs: 'Butler, Judith',
   role: 'Author',
 }];
+o.meta = {
+  calibre: {
+    series: 1,
+    authorLinkMap: { a: 'b'},
+  },
+};
 return opf.writeOPF('example.opf', o);
