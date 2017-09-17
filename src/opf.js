@@ -22,6 +22,7 @@ export class OPF {
     const parsedXmlDataToUse = parsedXmlData || _.cloneDeep(OPF_DEFAULT);
     this.data = parsedXmlDataToUse;
     this.metadata = this.data.package.metadata[0];
+    this.metaTags = undefined;
   }
 
   merge(obj) {
@@ -35,6 +36,29 @@ export class OPF {
     });
   }
 
+  get meta() {
+    if (this.metaTags) return this.metaTags;
+    if (this.metadata.meta === undefined) return undefined;
+    this.metaTags = this.metadata.meta.reduce((p, v) => {
+      const { name, content } = v.$;
+      const result = name.match(/^(\w+):(\S+)/);
+      if (result === null) {
+        // not namespaced
+        p[name] = content;
+      } else {
+        const namespace = result[1];
+        const attr = _.camelCase(result[2]);
+        if (p[namespace]) {
+          p[namespace][attr] = content;
+        } else {
+          p[namespace] = { [attr]: content };
+        }
+      }
+      return p;
+    }, {});
+    return this.metaTags;
+  }
+
   get uniqueIdentifierKey() {
     return this.data.package.$['unique-identifier'];
   }
@@ -45,7 +69,7 @@ export class OPF {
   }
 
   get date() {
-    // TO DO:
+    // TODO:
     // opf-event data should be fetched as well.
     // detect and convert to date object (YYYY[-MM[-DD]])
     const field = this.metadata['dc:date'];
@@ -53,7 +77,7 @@ export class OPF {
   }
 
   set date(date) {
-    // TO DO:
+    // TODO:
     // opf-event data should be fetched as well.
     // detect and convert to date object (YYYY[-MM[-DD]])
     this.metadata['dc:date'] = [date.toISOString()];
@@ -131,6 +155,7 @@ const multipleDublinCoreProperties = [{
   alias: 'languages',
 }];
 
+// TODO: add simple cache for gotten item that is updated on set
 simpleDublinCoreProperties.forEach((property) => {
   const dcProperty = `dc:${property}`;
   function set(value) {

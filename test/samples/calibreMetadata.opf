@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='utf-8'?>
+<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="uuid_id">
+<metadata xmlns:dc="http://purl.org/dc/elements/1.1/" xmlnspf="http://www.idpf.org/2007/opf">
+<dc:identifier opf:scheme="calibre" id="calibre_id">58</dc:identifier>
+<dc:identifier opf:scheme="uuid" id="uuid_id">fabc6e5f-dba8-471d-b4f3-595101d2a608</dc:identifier>
+<dc:title>Foundation</dc:title>
+<dc:creator opf:file-as="Asimov, Isaac" opf:role="aut">Isaac Asimov</dc:creator>
+<dc:contributor opf:file-as="calibre" opf:role="bkp">calibre (1.2.0) [http://calibre-ebook.com]</dc:contributor>
+<dc:date>1951-01-02T05:00:00+00:00</dc:date>
+<dc:description>DESCRIPTION</dc:description>
+<dc:publisher>Spectra</dc:publisher>
+<dc:identifier opf:scheme="AMAZON">0553382578</dc:identifier>
+<dc:identifier opf:scheme="GOOGLE">IwywDY4P6gsC</dc:identifier>
+<dc:identifier opf:scheme="ISBN">9780553293357</dc:identifier>
+<dc:language>eng</dc:language>
+<meta content="{&quot;Isaac Asimov&quot;: &quot;&quot;}" name="calibre:author_link_map"/>
+<meta content="Foundation" name="calibre:series"/>
+<meta content="3" name="calibre:series_index"/>
+<meta content="8.0" name="calibre:rating"/>
+<meta content="0101-01-01T05:00:00+00:00" name="calibre:timestamp"/>
+<meta content="Foundation" name="calibre:title_sort"/>
+</metadata>
+<guide>
+<reference href="Foundation - Isaac Asimov.jpg" title="Cover" type="cover"/>
+</guide>
+</package>

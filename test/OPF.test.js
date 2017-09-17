@@ -189,6 +189,22 @@ describe('OPF class', () => {
     });
   });
 
+  context('with calibre OPF object', () => {
+    let opf;
+    beforeEach(() => readOPF(path.join(__dirname, './samples/calibreMetadata.opf')).then((obj) => { opf = obj; }));
+
+    it('allows access to namespaced meta tag content', () => {
+      expect(opf.meta.calibre).to.deep.equal({
+        authorLinkMap: '{"Isaac Asimov": ""}',
+        series: 'Foundation',
+        seriesIndex: '3',
+        rating: '8.0',
+        timestamp: '0101-01-01T05:00:00+00:00',
+        titleSort: 'Foundation',
+      });
+    });
+  });
+
   it('throws error if you try and set title as anything but string', () => {
     const opf = new OPF();
     const erroredTypes = [1, [], {}, null, undefined, NaN];
@@ -229,6 +245,7 @@ describe('OPF class', () => {
       expect(() => { opf.identifiers = v; }).to.throw(Error, /identifiers must be set with an array of objects with scheme and value keys/),
     );
   });
+
   describe('opf#merge function', () => {
     it('takes an object and assigns its values to the opf', () => {
       const obj = {
