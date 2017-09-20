@@ -15,6 +15,15 @@ describe('OPF class', () => {
     let opf;
     before(() => readOPF(path.join(__dirname, './samples/metadata.opf')).then((obj) => { opf = obj; }));
 
+    it('has a cover image (if source has one)', () => {
+      expect(opf.cover).to.eql('cover.jpg');
+    });
+
+    it('can have an cover image set', () => {
+      opf.cover = 'image.jpg';
+      expect(opf.cover).to.eql('image.jpg');
+    });
+
     it('has the title "After Colonialism: Imperial Histories and Postcolonial Displacements"', () => {
       expect(opf.title).to.eql('After Colonialism: Imperial Histories and Postcolonial Displacements');
     });
@@ -111,6 +120,17 @@ describe('OPF class', () => {
     it('should return OPF_DEFAULT when constructed outside readOPF', () => {
       const opf = new OPF();
       expect(opf.data).to.eql(OPF_DEFAULT);
+    });
+
+    it('does not have a cover image', () => {
+      const opf = new OPF();
+      expect(opf.cover).to.eql(undefined);
+    });
+
+    it('can have an cover image set', () => {
+      const opf = new OPF();
+      opf.cover = 'image.jpg';
+      expect(opf.cover).to.eql('image.jpg');
     });
 
     it('can have a multiple titles set', () => {

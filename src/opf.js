@@ -22,7 +22,33 @@ export class OPF {
     const parsedXmlDataToUse = parsedXmlData || _.cloneDeep(OPF_DEFAULT);
     this.data = parsedXmlDataToUse;
     this.metadata = this.data.package.metadata[0];
+    this.guide = _.get(this.data, 'package.guide[0]');
     this.metaTags = undefined;
+  }
+
+  get cover() {
+    if (!this.guide || !this.guide.reference) return undefined;
+    const v = this.guide.reference.find(ref => typeof ref.$.type === 'string' && ref.$.type.toLowerCase() === 'cover');
+    return v.$.href;
+    // return;
+  }
+
+  set cover(src) {
+    if (!this.guide) {
+      this.guide = {};
+    }
+    if (!this.guide.reference) {
+      this.guide.reference = [];
+    }
+    const v = this.guide.reference.find(ref => typeof ref.$.type === 'string' && ref.$.type.toLowerCase() === 'cover');
+    if (v) v.$.href = src;
+    else {
+      this.guide.reference.push({ $: {
+        type: 'cover',
+        title: 'Cover',
+        href: src,
+      } });
+    }
   }
 
   merge(obj) {
@@ -108,6 +134,7 @@ export class OPF {
       this.metadata.meta = metaTagsMap.fromObject(this.metaTags);
     }
     this.data.package.metadata = [this.metadata];
+    this.data.package.guide = [this.guide];
     return builder.buildObject(this.data);
   }
 }

@@ -49,5 +49,7 @@ Chapter 12. In a Spirit of Calm Violence by Homi K. Bhabha</dc:description>
     </metadata>
     <guide>
         <reference href="cover.jpg" title="Cover" type="cover"/>
+        <reference href="4.jpg"/>
+        <reference href="2.jpg"/>
     </guide>
 </package>

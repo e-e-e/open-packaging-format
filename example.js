@@ -10,7 +10,8 @@ o.authors = [{
 o.meta = {
   calibre: {
     series: 1,
-    authorLinkMap: { a: 'b'},
+    authorLinkMap: { a: 'b' },
   },
 };
+o.cover = 'hello.png';
 return opf.writeOPF('example.opf', o);
