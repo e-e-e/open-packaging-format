@@ -133,8 +133,8 @@ export class OPF {
       // reinject metaTags back into xml structure before building
       this.metadata.meta = metaTagsMap.fromObject(this.metaTags);
     }
-    this.data.package.metadata = [this.metadata];
-    this.data.package.guide = [this.guide];
+    if (this.metadata) this.data.package.metadata = [this.metadata];
+    if (this.guide) this.data.package.guide = [this.guide];
     return builder.buildObject(this.data);
   }
 }
