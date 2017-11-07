@@ -61,8 +61,8 @@
     "sinon": "^2.1.0"
   },
   "dependencies": {
-    "bluebird": "^3.4.7",
-    "lodash": "^4.17.4",
-    "xml2js": "^0.4.17"
+    "bluebird": "3.4.7",
+    "lodash": "4.17.4",
+    "xml2js": "0.4.17"
   }
 }

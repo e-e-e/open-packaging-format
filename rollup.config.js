@@ -9,15 +9,15 @@ export default {
   input: 'src/opf.js',
   // moduleName: 'dat-library-ui',
   plugins: [
+    babel({
+      exclude: 'node_modules/**',
+    }),
     commonjs(),
     resolve({
       extensions: ['.js', '.json'],
       customResolveOptions: {
         moduleDirectory: 'node_modules',
       },
-    }),
-    babel({
-      exclude: 'node_modules/**',
     }),
   ],
   external: [...Object.keys(pkg.dependencies), 'fs'],
