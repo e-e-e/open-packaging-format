@@ -217,3 +217,19 @@ export function readOPF(fileLoc, encoding = 'utf-8') {
 export function writeOPF(fileLoc, opf) {
   return fs.writeFile(fileLoc, opf.toXML());
 }
+
+/* TODO: extend to accomodate dcterms.
+  Including:
+    IsPartOf
+    HasPart
+    IsVersionOf
+    HasVersion
+    IsFormatOf
+    HasFormat
+    References
+    IsReferencedBy
+    IsBasedOn
+    IsBasisFor
+    Requires
+    IsRequiredBy
+*/
